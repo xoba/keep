@@ -284,9 +284,11 @@ server includes when the secret parses as JSON. The SDK reads only
   of the contract; tests point `Client.BaseURL` at it (the one sanctioned
   use of that field). mTLS paths get real self-signed certs in
   `t.TempDir()`.
-- **Integration tests** (env-gated, skipped by default): when
-  `KEEP_TEST_IDENTITY` is set, the same suite runs against the real
-  deployment at the built-in endpoint. No identities are ever committed.
+- **Integration smoke test** (env-gated, skipped by default): when
+  `KEEP_TEST_IDENTITY` names a registered identity directory, a
+  deliberately read-mostly smoke test (status report + secret listing)
+  runs against the real deployment at the built-in endpoint. No
+  identities are ever committed.
 - No cross-module test imports either (S1): the server project maintains
   its side of the contract with its own tests. Drift between the two is
   caught by the integration suite and by the fleet itself.
