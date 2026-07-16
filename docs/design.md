@@ -363,6 +363,10 @@ Phased; each phase leaves both projects working.
   CLI and dashboard; update its docs (integration guide points here; design
   decision record amended; the server binary becomes server + admin +
   dashboard + recovery only). The two modules never import each other.
+  **Done 2026-07-16**: `client/` and the client subcommands deleted, admin
+  operations moved to an internal package (server decision D24), docs
+  rewired, and the server deployed. The extraction is complete; `v1.0.0`
+  (S8) is unblocked and waits only on fleet soak.
 
 Rollback at any phase is trivial: the parent keeps its `client` package
 until phase 4, and consumers can re-point a `replace` directive in one line.
