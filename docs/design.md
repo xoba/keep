@@ -321,6 +321,7 @@ commit as already published.
 Phased; each phase leaves both projects working.
 
 - **Phase 0 — design** (this document). Agree the decisions in §9.
+  **Done 2026-07-16.**
 - **Phase 1 — implement**: port `client.go`, `renew.go`, `sdk.go`, the
   identity functions, and the client CLI subcommands into this module per
   §3–§4. Write `API.md` and the fake-server test suite. Add `AGENTS.md`
@@ -328,6 +329,9 @@ Phased; each phase leaves both projects working.
   `test`, `scan`). Private origin only. In tandem, the parent server adds
   the one new route this design introduces — `POST
   /v1/self/desired-revision` (additive per S4, scoped per S10).
+  **Done 2026-07-16**: SDK + CLI implemented with contract tests; the
+  server route shipped and was verified live (401 without a client cert;
+  end-to-end write with a deployment identity).
 - **Phase 2 — first-party consumers**: the three existing consumers import
   `xoba.com/keep/client` and require `xoba.com/keep`, resolved by
   `replace`/`go.work` to the server checkout — which no longer declares
@@ -338,6 +342,11 @@ Phased; each phase leaves both projects working.
   `go.mod` — required for `go mod tidy` even where a `go.work` exists) at
   this checkout, `go mod tidy`, rebuild, verify against the live fleet.
   Deploy scripts may then adopt `keep set-desired` per project, at leisure.
+  **Done 2026-07-16**: all three consumers switched, rebuilt, and verified
+  against the live fleet (running = desired everywhere, all healthy);
+  their deploy flows now publish desired revisions with their own
+  deployment identities via the self-scoped route — none uses the admin
+  identity anymore.
 - **Phase 3 — publish**: create `github.com/xoba/keep` (the vanity meta
   already points there — §3), push, tag `v0.1.0`. Publication happens the
   moment the repository is public; there is no partial state. Consumers
