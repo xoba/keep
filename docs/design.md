@@ -351,6 +351,12 @@ Phased; each phase leaves both projects working.
   already points there — §3), push, tag `v0.1.0`. Publication happens the
   moment the repository is public; there is no partial state. Consumers
   drop their `replace` directives and fetch normally.
+  **Done 2026-07-16**: published (created private, inspected, flipped
+  public) and tagged `v0.1.0`; verified from scratch modules via
+  `GOPROXY=direct`, via proxy.golang.org with sum.golang.org
+  verification, and via `go install` of the CLI. All three consumers
+  dropped their `replace` directives, pinned `v0.1.0`, and were rebuilt
+  and verified against the live fleet.
 - **Phase 4 — extract from the server project**: delete `client/` and the
   client CLI subcommands from `keepcentral.com`; move the admin operations
   to an internal package with its own minimal mTLS client; rewire the admin
@@ -378,5 +384,7 @@ until phase 4, and consumers can re-point a `replace` directive in one line.
 
 ## Open questions
 
-1. Should `v0.1.0` wait for phase 2 (fleet-proven) or ship at phase 3
-   directly? (S8 implies phase 3; fleet soak first is the cautious read.)
+1. **RESOLVED 2026-07-16:** `v0.1.0` shipped at phase 3, the same day
+   phase 2 put the fleet on the SDK — the soak was hours, accepted
+   deliberately: v0.x signals instability, and the consumers are all
+   first-party.
