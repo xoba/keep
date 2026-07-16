@@ -261,8 +261,9 @@ backup-upload response.
 `Lease` timing fields (`issued_at`, `refresh_after`, `soft_lease_until`,
 RFC 3339) drive the renewal policy in §4. The payload travels in two
 fields, both exported on `Lease`: `payload_base64` — always present,
-authoritative, decoding to the exact stored secret bytes (by convention a
-small flat JSON document) — and `payload`, a raw-JSON convenience echo the
+authoritative, decoding to the exact stored secret bytes (by convention
+the provider's credential verbatim, usually plain text) — and `payload`,
+a raw-JSON convenience echo the
 server includes when the secret parses as JSON. The SDK reads only
 `payload_base64`.
 

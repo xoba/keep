@@ -96,8 +96,8 @@ func (s *SDK) ListSecrets() ([]string, error) {
 // operation: after the first call it reads from memory, and a rotated value
 // appears here within the renewal window (~12 h) with no restart.
 //
-// The value is the exact stored payload bytes as a string — by convention a
-// small flat JSON document.
+// The value is the exact stored payload bytes as a string — by convention
+// the provider's credential verbatim, usually plain text.
 func (s *SDK) FetchSecret(name string) (string, error) {
 	s.mu.Lock()
 	r := s.leases[name]
