@@ -121,7 +121,9 @@ type Status struct {
 }
 
 // DefaultStatus fills a status report: revision and client version from
-// build info, hostname from the OS, start time from the clock.
+// build info, hostname from the OS, start time from the clock. Build info
+// carries vcs.revision only for binaries built inside a VCS checkout;
+// otherwise RunningRevision is left empty (see WithRunningRevision).
 func DefaultStatus(health string) Status {
 	st := Status{Health: health, StartedAt: time.Now().UTC().Format(time.RFC3339)}
 	if bi, ok := debug.ReadBuildInfo(); ok {

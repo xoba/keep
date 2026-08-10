@@ -657,3 +657,41 @@ func TestSDK(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestSDKWithRunningRevision(t *testing.T) {
+	f := newFakeServer(t)
+	dir, keyid := newIdentity(t)
+	f.register(keyid, "svc")
+
+	// Constructed by hand for the same reason as TestSDK; options applied
+	// before the loop starts, exactly as in NewSDK.
+	ctx, cancel := context.WithCancel(context.Background())
+	s := &SDK{
+		c: newTestClient(t, f, dir), ctx: ctx, cancel: cancel,
+		leases: map[string]*Renewed{},
+		base:   DefaultStatus("healthy"),
+	}
+	WithRunningRevision("build-42")(s)
+	go s.statusLoop()
+	defer s.Close()
+
+	deadline := time.Now().Add(10 * time.Second)
+	for {
+		f.mu.Lock()
+		n := len(f.statuses)
+		f.mu.Unlock()
+		if n > 0 {
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatal("no status report within 10s")
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
+	f.mu.Lock()
+	got := f.statuses[0].RunningRevision
+	f.mu.Unlock()
+	if got != "build-42" {
+		t.Fatalf("RunningRevision = %q, want %q", got, "build-42")
+	}
+}

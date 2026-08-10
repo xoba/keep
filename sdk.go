@@ -26,13 +26,28 @@ type SDK struct {
 	base     Status // captured once: start time, revision, host
 }
 
+// Option configures the SDK at construction. Options are applied before
+// the first status report goes out.
+type Option func(*SDK)
+
+// WithRunningRevision sets the revision reported in every keep-alive,
+// replacing the one taken from build info. Build info carries vcs.revision
+// only when the binary was built inside a VCS checkout, so projects
+// deployed from tarballs or images, or built with -buildvcs=false, must
+// supply their revision here. Use the same identifier scheme the deploy
+// pipeline publishes via SetDesiredRevision — the operator's dashboard
+// compares the two to spot drift.
+func WithRunningRevision(revision string) Option {
+	return func(s *SDK) { s.base.RunningRevision = revision }
+}
+
 // NewSDK builds the high-level client from an identity directory (as
 // written by `keep keygen`) and immediately begins sending keep-alive
 // status reports every 5 minutes (after 15 silent minutes the operator's
 // dashboard shows the deployment offline). Health defaults to "healthy",
 // meaning only "this process is up" — services that can genuinely
 // self-assess should call SetHealth. Close stops the reports.
-func NewSDK(identityDir string) (*SDK, error) {
+func NewSDK(identityDir string, opts ...Option) (*SDK, error) {
 	c, err := New(identityDir)
 	if err != nil {
 		return nil, err
@@ -42,6 +57,9 @@ func NewSDK(identityDir string) (*SDK, error) {
 		c: c, ctx: ctx, cancel: cancel,
 		leases: map[string]*Renewed{},
 		base:   DefaultStatus("healthy"),
+	}
+	for _, o := range opts {
+		o(s)
 	}
 	go s.statusLoop()
 	return s, nil

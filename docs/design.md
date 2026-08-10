@@ -171,9 +171,10 @@ Types: `Status`, `Lease` (+ `PayloadBytes()`), `SecretInfo`, `BackupResult` —
 JSON shapes fixed by the wire contract (§5).
 
 The base URL is a hardcoded constant, `https://api.keepcentral.com` (S9);
-`New` and `NewSDK` take only the identity directory. `Client.BaseURL`
-remains an exported field so the test suite can point at a fake server —
-a test seam, not a configuration knob.
+`New` takes only the identity directory, and `NewSDK` adds only
+construction options (`WithRunningRevision`) — nothing that can name a
+server. `Client.BaseURL` remains an exported field so the test suite can
+point at a fake server — a test seam, not a configuration knob.
 
 **Renewable-lease policy** (unchanged): initial lease synchronous (caller
 decides cold-start behavior); refresh at the server's `refresh_after` (~12 h)
@@ -184,7 +185,10 @@ lease; `onNew` fires on version change.
 
 **High-level SDK**: `NewSDK` starts keep-alives immediately (every 5 min
 ± 1 min jitter; the operator's dashboard shows a deployment offline after 15
-silent minutes); `SetHealth` installs a real health claim; `FetchSecret`
+silent minutes); `WithRunningRevision` supplies the reported revision when
+build info lacks `vcs.revision` (non-VCS builds) or when deploys are keyed
+by another identifier — it should match what the deploy pipeline publishes
+via `SetDesiredRevision`; `SetHealth` installs a real health claim; `FetchSecret`
 leases on first use, then reads from memory; `ListSecrets` names the secrets
 available to the deployment's service; `Backup` snapshots and uploads a
 SQLite database (stateless; run it periodically — uploads are idempotent);
